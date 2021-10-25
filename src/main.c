@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
+#include <unistd.h>
+#include <linux/fs.h>
 #include <libcpuid/libcpuid.h>
 #include <sys/sysinfo.h>
 #include "colour.h"
@@ -12,6 +16,8 @@ int main(void) {
 	struct cpu_id_t       CPU_data;
 	bool                  CPU          = true;
 	size_t                CPU_SpeedMHz = 0;
+	char*                 CPU_Name;
+	char*                 CPU_Name_tmp;
 	
 	if (cpuid_get_raw_data(&CPU_rawdata) < 0) {
 		CPU = false;
@@ -20,8 +26,20 @@ int main(void) {
 		CPU = false;
 	}
 	if (CPU) {
+		CPU_Name_tmp = (char*) malloc(strlen(CPU_data.brand_str) + 1);
+		strcpy(CPU_Name_tmp, CPU_data.brand_str);
+		if (strstr(CPU_Name_tmp, "@")) {
+			CPU_Name = (char*) malloc((int)(strrchr(CPU_Name_tmp, '@') - CPU_Name_tmp));
+			sprintf(CPU_Name, "%.*s", (int)(strrchr(CPU_Name_tmp, '@') - CPU_Name_tmp), CPU_Name_tmp);
+		}
+		else {
+			CPU_Name = (char*) malloc(strlen(CPU_data.brand_str) + 1);
+			strcpy(CPU_Name, CPU_data.brand_str);
+		}
+		free(CPU_Name_tmp);
 		CPU_SpeedMHz =  cpu_clock_measure(200, 0);
-		printf(colour_green "CPU: " colour_reset "%s (%i cores, %i threads) @ %liMHz\n", CPU_data.brand_str, CPU_data.num_cores, CPU_data.total_logical_cpus , CPU_SpeedMHz);
+		printf(colour_green "CPU: " colour_reset "%s (%i cores, %i threads) @ %liMHz\n", CPU_Name, CPU_data.num_cores, CPU_data.total_logical_cpus , CPU_SpeedMHz);
+		free(CPU_Name);
 		printf(colour_green "CPU Cache: " colour_reset "%iK L1 %iK L2\n", CPU_data.l1_data_cache, CPU_data.l2_cache);
 	}
 
