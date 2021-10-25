@@ -29,7 +29,7 @@ int main(void) {
 	struct sysinfo sys_info;
 	size_t         RAM_GB;
 	sysinfo(&sys_info);
-	RAM_GB = (size_t) ceil((((sys_info.totalram + 512)/1024)/1024)/1024);
+	RAM_GB = (size_t) ceil(((((sys_info.totalram) / 1024) / 1024) / 1024) + 0.5);
 	printf(colour_green "RAM: " colour_reset "%liGB\n", RAM_GB);
 
 	// Swap
