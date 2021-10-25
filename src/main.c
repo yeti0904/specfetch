@@ -18,6 +18,7 @@ int main(void) {
 	size_t                CPU_SpeedMHz = 0;
 	char*                 CPU_Name;
 	char*                 CPU_Name_tmp;
+	char                  CPU_colour[] = colour_green;
 	
 	if (cpuid_get_raw_data(&CPU_rawdata) < 0) {
 		CPU = false;
@@ -26,6 +27,12 @@ int main(void) {
 		CPU = false;
 	}
 	if (CPU) {
+		if (strcmp(CPU_data.vendor_str, "GenuineIntel") == 0) {
+			strcpy(CPU_colour, colour_red);
+		}
+		else if (strcmp(CPU_data.vendor_str, "AuthenticAMD") == 0) {
+			strcpy(CPU_colour, colour_red);
+		}
 		CPU_Name_tmp = (char*) malloc(strlen(CPU_data.brand_str) + 1);
 		strcpy(CPU_Name_tmp, CPU_data.brand_str);
 		if (strstr(CPU_Name_tmp, "@")) {
@@ -38,9 +45,9 @@ int main(void) {
 		}
 		free(CPU_Name_tmp);
 		CPU_SpeedMHz =  cpu_clock_measure(200, 0);
-		printf(colour_green "CPU: " colour_reset "%s (%i cores, %i threads) @ %liMHz\n", CPU_Name, CPU_data.num_cores, CPU_data.total_logical_cpus , CPU_SpeedMHz);
+		printf("%sCPU: " colour_reset "%s (%i cores, %i threads) @ %liMHz\n", CPU_colour, CPU_Name, CPU_data.num_cores, CPU_data.total_logical_cpus , CPU_SpeedMHz);
 		free(CPU_Name);
-		printf(colour_green "CPU Cache: " colour_reset "%iK L1 %iK L2\n", CPU_data.l1_data_cache, CPU_data.l2_cache);
+		printf("%sCPU Cache: " colour_reset "%iK L1 %iK L2\n", CPU_colour, CPU_data.l1_data_cache, CPU_data.l2_cache);
 	}
 
 	// RAM
@@ -48,11 +55,11 @@ int main(void) {
 	size_t         RAM_GB;
 	sysinfo(&sys_info);
 	RAM_GB = (size_t) ceil(((((sys_info.totalram) / 1024) / 1024) / 1024) + 0.5);
-	printf(colour_green "RAM: " colour_reset "%liGB\n", RAM_GB);
+	printf("%sRAM: " colour_reset "%liGB\n", CPU_colour, RAM_GB);
 
 	// Swap
 	size_t Swap_MB = (size_t) round(((sys_info.totalswap + 512)/1024)/1024);
-	printf(colour_green "Swap: " colour_reset "%liMB\n", Swap_MB);
+	printf("%sSwap: " colour_reset "%liMB\n", CPU_colour, Swap_MB);
 
 	// end of program
 	return 0;
