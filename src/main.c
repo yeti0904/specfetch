@@ -28,7 +28,7 @@ int main(void) {
 	}
 	if (CPU) {
 		if (strcmp(CPU_data.vendor_str, "GenuineIntel") == 0) {
-			strcpy(CPU_colour, colour_red);
+			strcpy(CPU_colour, colour_cyan);
 		}
 		else if (strcmp(CPU_data.vendor_str, "AuthenticAMD") == 0) {
 			strcpy(CPU_colour, colour_red);
